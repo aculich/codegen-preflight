@@ -1,0 +1,106 @@
+{
+  "name": "codegen-preflight",
+  "displayName": "Codegen Preflight",
+  "description": "Daily state-of-the-world snapshot for greenfield projects",
+  "version": "0.1.0",
+  "publisher": "codegen-preflight",
+  "engines": {
+    "vscode": "^1.85.0",
+    "cursor": "*"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "outputChannels": [
+      {
+        "id": "codegenPreflight",
+        "label": "Codegen Preflight"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "codegenPreflight",
+          "name": "Codegen Preflight",
+          "when": "true"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codegenPreflight.refresh",
+        "title": "Refresh Snapshot",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codegenPreflight.forceRefresh",
+        "title": "Force Refresh Snapshot"
+      },
+      {
+        "command": "codegenPreflight.openPanel",
+        "title": "Open Preflight Panel"
+      },
+      {
+        "command": "codegenPreflight.configureApiKeys",
+        "title": "Configure API Keys",
+        "icon": "$(key)"
+      },
+      {
+        "command": "codegenPreflight.copyRuleFile",
+        "title": "Copy Rule File to Clipboard"
+      },
+      {
+        "command": "codegenPreflight.generateGlobalConfig",
+        "title": "Generate Global Cursor Config"
+      },
+      {
+        "command": "codegenPreflight.checkBeforeCoding",
+        "title": "Check Preflight Before Coding",
+        "enablement": "true"
+      }
+    ],
+    "configuration": {
+      "title": "Codegen Preflight",
+      "properties": {
+        "codegenPreflight.openaiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API key for model discovery",
+          "scope": "application"
+        },
+        "codegenPreflight.anthropicApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API key for model discovery",
+          "scope": "application"
+        },
+        "codegenPreflight.geminiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Google Gemini API key for model discovery",
+          "scope": "application"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@codegen-preflight/mcp-server": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.3",
+    "@vscode/vsce": "^2.22.0"
+  }
+}
+

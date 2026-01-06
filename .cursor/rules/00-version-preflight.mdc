@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+description: "Policy: always use the auto-generated version/model snapshot for codegen."
+---
+
+# Codegen Freshness Policy
+
+Before generating code or entering Plan Mode, you MUST ensure the snapshot is fresh.
+
+**Automatic Check:**
+- The Codegen Preflight extension automatically checks for stale snapshots on startup
+- If the extension is installed, it will auto-refresh snapshots older than 24 hours
+- You can trigger a manual check by running: `Codegen Preflight: Check Before Coding`
+
+**Manual Refresh:**
+If the snapshot is older than 24 hours or missing:
+1) Ask the user to run `/preflight` (preferred), OR
+2) If you are in Agent mode and have terminal access, run:
+   `npm run preflight` or use the Codegen Preflight extension to refresh
+
+**Before Plan Mode:**
+- The extension hooks into workspace events to ensure freshness
+- If you're about to start a major coding session, consider running `/preflight` to force a refresh
+
+Then continue with the coding task.
+
+## Rules
+
+* Never invent model IDs. Prefer discovered IDs or the selected defaults in the snapshot.
+* Never recommend deprecated SDKs if the snapshot indicates replacements.
+* Always use the latest SDK versions from the snapshot when writing install snippets for new projects.
+* When the user asks for a "best" model, use the selected defaults from the snapshot based on the category (reasoning, fast, vision).

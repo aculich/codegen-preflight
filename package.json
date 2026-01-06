@@ -1,0 +1,21 @@
+{
+  "name": "codegen-preflight",
+  "version": "0.1.0",
+  "description": "Codegen preflight tool for Cursor - daily state-of-the-world snapshot",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspaces",
+    "preflight": "node scripts/preflight.js",
+    "check-models": "node scripts/check-models.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}
+
