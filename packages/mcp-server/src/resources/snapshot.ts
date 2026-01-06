@@ -25,6 +25,10 @@ export interface Snapshot {
       provider: string;
       model_id: string;
       display_name?: string;
+      release_date?: string;
+      is_preview?: boolean;
+      is_deprecated?: boolean;
+      model_type?: 'chat' | 'image' | 'embedding' | 'audio' | 'other';
     }>;
     selected: Record<
       string,
@@ -174,6 +178,10 @@ export async function generateSnapshot(
         provider: m.provider,
         model_id: m.model_id,
         display_name: m.display_name,
+        release_date: m.release_date,
+        is_preview: m.is_preview,
+        is_deprecated: m.is_deprecated,
+        model_type: m.model_type,
       })),
       selected,
     },
