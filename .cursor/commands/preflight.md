@@ -3,8 +3,9 @@
 You are the Cursor Agent. Do this in order:
 
 1) **Force refresh the snapshot** (even if one was done today):
-   - If the Codegen Preflight extension is installed: Use the "Force Refresh Snapshot" command from the command palette (Cmd+Shift+P → "Codegen Preflight: Force Refresh Snapshot")
-   - Otherwise: `npm run preflight` (if available) or manually trigger the snapshot generation
+   - Run: `npm run preflight` in the terminal
+   - This will generate a fresh snapshot and update `.cursor/rules/01-version-snapshot.mdc`
+   - Wait for it to complete before proceeding
 
 2) Open `.cursor/rules/01-version-snapshot.mdc` and confirm:
    - It has today's timestamp
