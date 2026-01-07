@@ -14,7 +14,15 @@ type Snapshot = {
     pypi_latest: Record<string, string>;
   };
   models: {
-    discovered: Array<{ provider: string; model_id: string; display_name?: string }>;
+    discovered: Array<{
+      provider: string;
+      model_id: string;
+      display_name?: string;
+      release_date?: string;
+      is_preview?: boolean;
+      is_deprecated?: boolean;
+      model_type?: 'chat' | 'image' | 'embedding' | 'audio' | 'other';
+    }>;
     selected: Record<string, Record<string, string | null>>;
   };
   codegen_instructions?: Array<{ sdk: string; provider: string; content: string; source_url?: string }>;
@@ -114,10 +122,16 @@ export class PreflightPanel {
 
   private async _refresh(useCache: boolean) {
     this._panel.webview.postMessage({ command: 'loading' });
-    const snapshot = await this._snapshotManager.getSnapshot(!useCache);
-    const cacheInfo = await this._snapshotManager.getCacheInfo();
-    this._panel.webview.html = this._getHtmlForWebview(snapshot, cacheInfo);
-    this._panel.webview.postMessage({ command: 'loaded' });
+    try {
+      const snapshot = await this._snapshotManager.getSnapshot(!useCache);
+      const cacheInfo = await this._snapshotManager.getCacheInfo();
+      this._panel.webview.html = this._getHtmlForWebview(snapshot, cacheInfo);
+      this._panel.webview.postMessage({ command: 'loaded' });
+      vscode.window.showInformationMessage('Snapshot refreshed successfully');
+    } catch (error) {
+      this._panel.webview.postMessage({ command: 'error', error: String(error) });
+      vscode.window.showErrorMessage(`Failed to refresh snapshot: ${error}`);
+    }
   }
 
   private async _copyRuleFile() {
@@ -253,6 +267,85 @@ export class PreflightPanel {
             color: var(--vscode-errorForeground);
             font-style: italic;
         }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 6px;
+            font-weight: bold;
+        }
+        .preview-badge {
+            background: var(--vscode-textBlockQuote-background);
+            color: var(--vscode-textBlockQuote-border);
+        }
+        .deprecated-badge {
+            background: var(--vscode-errorForeground);
+            color: var(--vscode-editor-background);
+        }
+        .release-date {
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.9em;
+        }
+        .model-type-section {
+            margin-bottom: 20px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            padding: 12px;
+        }
+        .model-type-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .model-type-header:hover {
+            color: var(--vscode-textLink-foreground);
+        }
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .model-item {
+            padding: 6px;
+            background: var(--vscode-input-background);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .model-item-id {
+            font-family: var(--vscode-editor-font-family);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .model-item-meta {
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+        }
+        .filter-controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 4px 8px;
+            background: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border: 1px solid var(--vscode-button-border);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .filter-btn:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+        }
+        .filter-btn.active {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
     </style>
 </head>
 <body>
@@ -261,6 +354,12 @@ export class PreflightPanel {
             <h2>Codegen Preflight</h2>
             <div class="timestamp">Last updated: ${snapshot.generated_at_iso} (${ageText})</div>
             ${snapshot.models.discovered.length === 0 ? '<div style="color: var(--vscode-errorForeground); margin-top: 8px; font-size: 0.9em;">⚠️ No models discovered. <a href="#" onclick="configureKeys()" style="color: var(--vscode-textLink-foreground);">Configure API keys</a> to enable model discovery.</div>' : ''}
+            <div id="loading-indicator" style="display: none; color: var(--vscode-descriptionForeground); margin-top: 8px;">
+              <span>🔄 Refreshing snapshot...</span>
+            </div>
+            <div id="error-indicator" style="display: none; color: var(--vscode-errorForeground); margin-top: 8px;">
+              <span>❌ Error: <span id="error-message"></span></span>
+            </div>
         </div>
         <div>
             <button class="refresh-btn" onclick="refresh(false)" style="margin-right: 8px;">Force Refresh</button>
@@ -274,21 +373,33 @@ export class PreflightPanel {
         <div class="section-title">Selected Default Models</div>
         ${Object.entries(snapshot.models.selected)
           .map(
-            ([category, providers]) => `
+            ([category, providers]) => {
+              const getModelInfo = (modelId: string | null) => {
+                if (!modelId) return null;
+                return snapshot.models.discovered.find(m => m.model_id === modelId);
+              };
+              return `
             <div class="model-category">
                 <div class="model-category-title">${category}</div>
                 ${Object.entries(providers)
                   .map(
-                    ([provider, modelId]) => `
+                    ([provider, modelId]) => {
+                      const model = getModelInfo(modelId);
+                      const dateInfo = model?.release_date ? ` <span class="release-date">(${model.release_date})</span>` : '';
+                      const previewBadge = model?.is_preview ? '<span class="badge preview-badge">[preview]</span>' : '';
+                      const deprecatedBadge = model?.is_deprecated ? '<span class="badge deprecated-badge">[deprecated]</span>' : '';
+                      return `
                     <div class="model-provider">
                         <strong>${provider}:</strong>
-                        <span class="model-id">${modelId || 'N/A'}</span>
+                        <span class="model-id">${modelId || 'N/A'}</span>${dateInfo}${previewBadge}${deprecatedBadge}
                     </div>
-                  `
+                  `;
+                    }
                   )
                   .join('')}
             </div>
-          `
+          `;
+            }
           )
           .join('')}
     </div>
@@ -327,8 +438,59 @@ export class PreflightPanel {
 
     <div class="section">
         <div class="section-title">Discovered Models</div>
-        <div>Total: ${snapshot.models.discovered.length}</div>
+        <div style="margin-bottom: 10px;">Total: ${snapshot.models.discovered.length}</div>
         ${snapshot.models.discovered.length === 0 ? '<div class="no-models">No models discovered. Set API keys to enable discovery.</div>' : ''}
+        ${snapshot.models.discovered.length > 0 ? (() => {
+          const byType: Record<string, typeof snapshot.models.discovered> = {};
+          const byProvider: Record<string, typeof snapshot.models.discovered> = {};
+          
+          for (const model of snapshot.models.discovered) {
+            const type = model.model_type || 'other';
+            if (!byType[type]) byType[type] = [];
+            byType[type].push(model);
+            
+            if (!byProvider[model.provider]) byProvider[model.provider] = [];
+            byProvider[model.provider].push(model);
+          }
+          
+          return `
+          <div class="filter-controls">
+            <button class="filter-btn active" onclick="filterModels('all')">All (${snapshot.models.discovered.length})</button>
+            ${Object.entries(byType).map(([type, models]) => 
+              `<button class="filter-btn" onclick="filterModels('${type}')">${type.charAt(0).toUpperCase() + type.slice(1)} (${models.length})</button>`
+            ).join('')}
+          </div>
+          ${Object.entries(byType).map(([type, typeModels]) => {
+            const previewCount = typeModels.filter(m => m.is_preview).length;
+            const deprecatedCount = typeModels.filter(m => m.is_deprecated).length;
+            return `
+            <div class="model-type-section" data-type="${type}">
+              <div class="model-type-header" onclick="toggleSection('${type}')">
+                ${type.charAt(0).toUpperCase() + type.slice(1)} Models (${typeModels.length})
+                ${previewCount > 0 ? `<span class="badge preview-badge">${previewCount} preview</span>` : ''}
+                ${deprecatedCount > 0 ? `<span class="badge deprecated-badge">${deprecatedCount} deprecated</span>` : ''}
+              </div>
+              <div class="model-list" id="models-${type}">
+                ${typeModels.slice(0, 20).map(model => {
+                  const dateInfo = model.release_date ? ` <span class="release-date">(${model.release_date})</span>` : '';
+                  const previewBadge = model.is_preview ? '<span class="badge preview-badge">preview</span>' : '';
+                  const deprecatedBadge = model.is_deprecated ? '<span class="badge deprecated-badge">deprecated</span>' : '';
+                  return `
+                  <div class="model-item" data-provider="${model.provider}">
+                    <div class="model-item-id">${model.model_id}${dateInfo}</div>
+                    <div class="model-item-meta">
+                      Provider: ${model.provider}${previewBadge}${deprecatedBadge}
+                    </div>
+                  </div>
+                `;
+                }).join('')}
+                ${typeModels.length > 20 ? `<div style="margin-top: 8px; color: var(--vscode-descriptionForeground); font-size: 0.9em;">... and ${typeModels.length - 20} more</div>` : ''}
+              </div>
+            </div>
+          `;
+          }).join('')}
+          `;
+        })() : ''}
     </div>
 
     <div class="section">
@@ -367,6 +529,49 @@ export class PreflightPanel {
                 command: 'generateGlobalConfig'
             });
         }
+        
+        function filterModels(type) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide model sections
+            document.querySelectorAll('.model-type-section').forEach(section => {
+                if (type === 'all' || section.dataset.type === type) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleSection(type) {
+            const list = document.getElementById('models-' + type);
+            if (list) {
+                list.style.display = list.style.display === 'none' ? 'grid' : 'none';
+            }
+        }
+        
+        // Handle loading and error states
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'loading':
+                    document.getElementById('loading-indicator').style.display = 'block';
+                    document.getElementById('error-indicator').style.display = 'none';
+                    break;
+                case 'loaded':
+                    document.getElementById('loading-indicator').style.display = 'none';
+                    break;
+                case 'error':
+                    document.getElementById('loading-indicator').style.display = 'none';
+                    document.getElementById('error-indicator').style.display = 'block';
+                    document.getElementById('error-message').textContent = message.error || 'Unknown error';
+                    break;
+            }
+        });
     </script>
 </body>
 </html>`;

@@ -34,7 +34,15 @@ type Snapshot = {
     pypi_latest: Record<string, string>;
   };
   models: {
-    discovered: Array<{ provider: string; model_id: string; display_name?: string }>;
+    discovered: Array<{
+      provider: string;
+      model_id: string;
+      display_name?: string;
+      release_date?: string;
+      is_preview?: boolean;
+      is_deprecated?: boolean;
+      model_type?: 'chat' | 'image' | 'embedding' | 'audio' | 'other';
+    }>;
     selected: Record<string, Record<string, string | null>>;
   };
   codegen_instructions?: Array<{ sdk: string; provider: string; content: string; source_url?: string }>;

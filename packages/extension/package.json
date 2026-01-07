@@ -27,6 +27,7 @@
         {
           "id": "codegenPreflight",
           "name": "Codegen Preflight",
+          "icon": "$(airplane)",
           "when": "true"
         }
       ]
