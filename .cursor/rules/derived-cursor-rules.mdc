@@ -1,0 +1,32 @@
+---
+description: AI rules derived by SpecStory from the project AI interaction history
+globs: *
+---
+
+## HEADERS
+
+## TECH STACK
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+## WORKFLOW & RELEASE RULES
+
+## DEBUGGING
+When debugging Typescript projects with interdependencies:
+1. Ensure the correct build order is enforced. Build dependencies (e.g. `@codegen-preflight/mcp-server`) before dependents (e.g. `extension`). Update the root `package.json` to reflect the correct build order. The build script should enforce this order (e.g., `"build": "npm run build --workspace=@codegen-preflight/mcp-server && npm run build --workspace=codegen-preflight"`).
+2. To resolve Typescript module resolution issues, add type declarations (`packages/extension/src/mcp-server-types.d.ts`) for dynamic imports.
+3. Enable Typescript project references: Update `tsconfig.json` files to support project references and set `"composite": true` in the dependency's `tsconfig.json`. Also ensure `allowSyntheticDefaultImports` is set to `true` and `noResolve` is set to `false` in the dependent's (`packages/extension`) `tsconfig.json`.
+4. Create `.vscode/launch.json` and `tasks.json` for F5 debugging in VS Code.
+5. Configure the launch configuration to use the correct paths for the extension workspace.
+
+## GIT
+1. When making changes that affect the build process or inter-project dependencies (e.g. Typescript project references), ensure the following files are committed:
+    - `package.json` (especially the build script)
+    - `packages/extension/tsconfig.json`
+    - `packages/mcp-server/tsconfig.json`
+    - Any necessary type declaration files (e.g., `packages/extension/src/mcp-server-types.d.ts`)
+    - `.vscode/launch.json` & `tasks.json` (optional, but recommended for improved developer experience)
+2. Add the following to `.gitignore`:
+    - `*.tsbuildinfo`
+    - `.specstory/`
+    - `.cursor/rules/derived-cursor-rules.mdc`

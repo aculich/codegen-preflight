@@ -6,3 +6,4 @@ dist/
 .codegen-preflight/
 .cursor/rules/01-version-snapshot.mdc
 
+.specstory/

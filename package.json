@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=@codegen-preflight/mcp-server && npm run build --workspace=codegen-preflight",
     "dev": "npm run dev --workspaces",
     "preflight": "node scripts/preflight.js",
     "check-models": "node scripts/check-models.js"
