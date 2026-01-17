@@ -271,12 +271,13 @@ The extension generates Cursor Rules files:
 
 Slash commands are defined in `.cursor/commands/` directory:
 - `/preflight` - Defined in `.cursor/commands/preflight.md` - Triggers snapshot refresh and reports version/model info
+- `/snapshot` - Defined in `.cursor/commands/snapshot.md` - Gets current snapshot information
 
 **How Cursor Commands Work:**
 - Cursor automatically discovers commands in `.cursor/commands/*.md` files
 - Commands are available in Cursor chat when the workspace contains these files
 - The extension creates/updates these files automatically
-- Commands can be used in chat: `/preflight` or `/snapshot` (if defined)
+- Commands can be used in chat: `/preflight` or `/snapshot`
 
 ### Installation Command Differences
 
