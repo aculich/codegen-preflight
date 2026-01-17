@@ -41,6 +41,8 @@ upstream/
 ../.cursor/
 ../../.cursor/
 ../../.git/
+../../.github/
+../.github/
 ../../.cursorignore
 ../../.cursorindexingignore
 ../../CHANGELOG.md
