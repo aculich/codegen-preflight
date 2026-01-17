@@ -41,9 +41,9 @@ upstream/
 # Exclude all files from parent directories
 ../*
 ../../*
-# Only include mcp-server dist files (not source or config)
-!../mcp-server/dist/
-!../../packages/mcp-server/dist/
+# Exclude mcp-server entirely (it's a workspace dependency, handled by npm)
+../mcp-server/
+../../packages/mcp-server/
 # But exclude parent directories themselves
 ../.cursor/
 ../../.cursor/
