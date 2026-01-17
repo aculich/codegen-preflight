@@ -64,8 +64,6 @@ flowchart TD
     N --> O[MCP Server]
 ```
 
-
-
 ## Implementation Tasks
 
 ### 1. Fix `/preflight` Slash Command
@@ -107,9 +105,6 @@ flowchart TD
         }]
       }
   ```
-
-
-
 
 - If custom icon needed, create SVG icon file in `packages/extension/media/` and reference it
 - Update `PreflightTreeItem` to use airplane icon for root item
@@ -189,9 +184,6 @@ Codegen Preflight (airplane icon)
         selected: Record<string, Record<string, string | null>>;
       };
   ```
-
-
-
 
 - Enhance webview HTML to display:
 - **Model grouping by type** with expandable sections
