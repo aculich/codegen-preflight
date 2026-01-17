@@ -4,6 +4,30 @@
   "description": "Daily state-of-the-world snapshot for greenfield projects",
   "version": "0.1.0",
   "publisher": "codegen-preflight",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aculich/codegen-preflight.git"
+  },
+  "homepage": "https://github.com/aculich/codegen-preflight#readme",
+  "bugs": {
+    "url": "https://github.com/aculich/codegen-preflight/issues"
+  },
+  "keywords": [
+    "cursor",
+    "vscode",
+    "extension",
+    "codegen",
+    "preflight",
+    "versioning",
+    "semver",
+    "snapshot",
+    "mcp",
+    "ai",
+    "llm",
+    "models"
+  ],
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.85.0",
     "cursor": "*"

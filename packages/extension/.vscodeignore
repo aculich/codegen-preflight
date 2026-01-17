@@ -1,0 +1,57 @@
+# Exclude source files
+src/
+tsconfig.json
+*.ts
+!*.d.ts
+
+# Exclude development files
+.vscode/
+.git/
+.gitignore
+*.log
+.env
+.env.local
+
+# Exclude test files
+**/*.test.ts
+**/*.spec.ts
+**/test/
+**/tests/
+**/__tests__/
+
+# Exclude source maps (optional - can include for debugging)
+*.map
+
+# Exclude documentation that's not needed in extension
+docs/
+design/
+*.md
+!README.md
+
+# Exclude upstream reference repos
+upstream/
+
+# Exclude other development files
+.eslintrc*
+.prettierrc*
+.editorconfig
+*.vsix
+
+# Exclude parent directory files (important for workspace structure)
+../.cursor/
+../../.cursor/
+../../.git/
+../../.cursorignore
+../../.cursorindexingignore
+../../CHANGELOG.md
+../../LICENSE
+../../README.md
+../../FEATURES.md
+../../QUICKSTART.md
+../../design/
+../../docs/
+../../scripts/
+../../upstream/
+../../node_modules/
+../../package.json
+../../package-lock.json
