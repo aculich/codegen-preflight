@@ -139,6 +139,21 @@ codegen-preflight/
 
 ## Development
 
+### IDE Extension Recommendations
+
+This project includes recommended IDE extensions in `.vscode/extensions.json`. These are **developer dependencies** that improve the development experience but are not required for the extension to function.
+
+**Recommended Extensions**:
+- **GitHub Pull Requests and Issues** - For workflow file editing and GitHub integration
+- **GitHub Copilot** - AI pair programming assistance
+- **TypeScript and JavaScript Language Features** - Enhanced TypeScript support
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+
+**Note**: These extensions are optional but recommended for contributors. They do not affect the packaged extension or its runtime dependencies. VS Code/Cursor will prompt you to install these when you open the project.
+
+### Building
+
 ```bash
 # Build all packages
 npm run build

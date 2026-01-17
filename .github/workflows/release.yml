@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # to create release
+      id-token: write  # for OpenID Connect (optional, for provenance)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
