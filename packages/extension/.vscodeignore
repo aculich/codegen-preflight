@@ -7,7 +7,6 @@ tsconfig.json
 # Exclude development files
 .vscode/
 .git/
-.gitignore
 *.log
 .env
 .env.local
@@ -19,7 +18,7 @@ tsconfig.json
 **/tests/
 **/__tests__/
 
-# Exclude source maps (optional - can include for debugging)
+# Exclude source maps
 *.map
 
 # Exclude documentation that's not needed in extension
@@ -28,28 +27,27 @@ design/
 *.md
 !README.md
 
-# Exclude upstream reference repos
-upstream/
-
 # Exclude other development files
 .eslintrc*
 .prettierrc*
 .editorconfig
 *.vsix
 
-# Exclude parent directory files (important for workspace structure)
-../.cursor/
-../../.cursor/
+# CRITICAL: Exclude ALL parent directory files
+# vsce scans parent directories, so we must exclude everything from ../ and ../../
+../.git/
+../.github/
 ../../.git/
 ../../.github/
-../.github/
+../../.cursor/
+../../.gitignore
 ../../.cursorignore
 ../../.cursorindexingignore
 ../../CHANGELOG.md
-../../LICENSE
 ../../README.md
 ../../FEATURES.md
 ../../QUICKSTART.md
+../../CONTRIBUTING.md
 ../../design/
 ../../docs/
 ../../scripts/
@@ -57,3 +55,4 @@ upstream/
 ../../node_modules/
 ../../package.json
 ../../package-lock.json
+../../.vscode/
