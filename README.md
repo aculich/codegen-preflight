@@ -34,9 +34,10 @@ Download and install the latest VSIX from the [GitHub Releases](https://github.c
 
 **For VS Code:**
 ```bash
-# Download the VSIX file
+# Download the latest VSIX file
+# Note: Replace v0.1.0 with the latest version from the releases page
 curl -L -o codegen-preflight.vsix \
-  https://github.com/aculich/codegen-preflight/releases/latest/download/codegen-preflight-0.1.0.vsix
+  https://github.com/aculich/codegen-preflight/releases/download/v0.1.0/codegen-preflight-0.1.0.vsix
 
 # Install using the code command
 code --install-extension codegen-preflight.vsix
@@ -44,11 +45,26 @@ code --install-extension codegen-preflight.vsix
 
 **For Cursor:**
 ```bash
-# Download the VSIX file
+# Download the latest VSIX file
+# Note: Replace v0.1.0 with the latest version from the releases page
 curl -L -o codegen-preflight.vsix \
-  https://github.com/aculich/codegen-preflight/releases/latest/download/codegen-preflight-0.1.0.vsix
+  https://github.com/aculich/codegen-preflight/releases/download/v0.1.0/codegen-preflight-0.1.0.vsix
 
 # Install using the cursor command
+cursor --install-extension codegen-preflight.vsix
+```
+
+**Quick Install (Latest Version):**
+```bash
+# Automatically get the latest release version and install
+# For VS Code:
+LATEST=$(curl -s https://api.github.com/repos/aculich/codegen-preflight/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+curl -L -o codegen-preflight.vsix "https://github.com/aculich/codegen-preflight/releases/download/${LATEST}/codegen-preflight-${LATEST#v}.vsix"
+code --install-extension codegen-preflight.vsix
+
+# For Cursor:
+LATEST=$(curl -s https://api.github.com/repos/aculich/codegen-preflight/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+curl -L -o codegen-preflight.vsix "https://github.com/aculich/codegen-preflight/releases/download/${LATEST}/codegen-preflight-${LATEST#v}.vsix"
 cursor --install-extension codegen-preflight.vsix
 ```
 
