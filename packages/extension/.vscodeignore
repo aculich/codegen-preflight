@@ -41,8 +41,9 @@ upstream/
 # Exclude all files from parent directories
 ../*
 ../../*
-!../mcp-server/
-!../../packages/
+# Only include mcp-server dist files (not source or config)
+!../mcp-server/dist/
+!../../packages/mcp-server/dist/
 # But exclude parent directories themselves
 ../.cursor/
 ../../.cursor/
