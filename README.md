@@ -20,14 +20,54 @@ Agentic coding IDEs generate "wrong-on-day-one" code because they lack current w
 
 ### Prerequisites
 
-- Node.js 20+
-- Cursor IDE
+- **VS Code** (v1.85.0+) or **Cursor IDE** (any version)
 - API keys (optional, for model discovery):
   - OpenAI API key
   - Anthropic API key
   - Google Gemini API key
 
-### Setup
+### Installation
+
+#### Option 1: Install from VSIX (Recommended)
+
+Download and install the latest VSIX from the [GitHub Releases](https://github.com/aculich/codegen-preflight/releases) page.
+
+**For VS Code:**
+```bash
+# Download the VSIX file
+curl -L -o codegen-preflight.vsix \
+  https://github.com/aculich/codegen-preflight/releases/latest/download/codegen-preflight-0.1.0.vsix
+
+# Install using the code command
+code --install-extension codegen-preflight.vsix
+```
+
+**For Cursor:**
+```bash
+# Download the VSIX file
+curl -L -o codegen-preflight.vsix \
+  https://github.com/aculich/codegen-preflight/releases/latest/download/codegen-preflight-0.1.0.vsix
+
+# Install using the cursor command
+cursor --install-extension codegen-preflight.vsix
+```
+
+**Note**: On some systems, Cursor may override the `code` command. If `code` points to Cursor, you can use either command. To check which IDE a command points to:
+```bash
+which code    # Shows the actual binary location
+code --version  # Shows version info
+```
+
+**Alternative: Manual Installation via UI**
+1. Download the VSIX file from the [releases page](https://github.com/aculich/codegen-preflight/releases)
+2. Open VS Code/Cursor
+3. Open Command Palette (Cmd+Shift+P / Ctrl+Shift+P)
+4. Run "Extensions: Install from VSIX..."
+5. Select the downloaded VSIX file
+
+#### Option 2: Development Setup
+
+For development or contributing:
 
 1. Install dependencies:
 ```bash
@@ -39,12 +79,39 @@ npm install
 npm run build
 ```
 
-3. Install the extension:
-   - Open the `packages/extension` folder in Cursor
+3. Run in development mode:
+   - Open the `packages/extension` folder in Cursor/VS Code
    - Press F5 to run the extension in development mode
    - Or package it: `cd packages/extension && npm run package`
 
 ## Usage
+
+### Cursor-Specific Features
+
+This extension is designed to work seamlessly with **Cursor IDE** and includes several Cursor-specific features:
+
+**MCP Server Integration:**
+- Automatically registers the MCP server in `.cursor/mcp.json`
+- Provides MCP tools accessible in Cursor chat (e.g., `generate_snapshot`, `list_llm_models`)
+- Exposes MCP resources (e.g., `preflight://snapshot/current`)
+
+**Cursor Rules Integration:**
+- Auto-generates `.cursor/rules/01-version-snapshot.mdc` with always-apply policy
+- Updates the rule file when snapshot refreshes
+- Supports global Cursor config at `~/.cursor/rules/01-version-snapshot.mdc`
+
+**Cursor Commands:**
+- Supports `/preflight` and `/snapshot` slash commands in Cursor chat
+- Commands are defined in `.cursor/commands/preflight.md`
+
+**Cursor API Hooks:**
+- Hooks into Cursor's workspace events for automatic snapshot checks
+- Detects workspace changes and ensures snapshot freshness
+- Runs daily background checks to keep snapshot up-to-date
+
+**VS Code Compatibility:**
+- The extension also works in VS Code, but Cursor-specific features (MCP, Rules, slash commands) are only available in Cursor
+- Core functionality (snapshot generation, side panel, commands) works in both IDEs
 
 ### Configuring API Keys
 
@@ -56,10 +123,12 @@ To enable model discovery, you need to configure API keys. You have three option
 3. Enter your API keys when prompted
 4. Keys are stored securely in VS Code settings
 
-**Option 2: VS Code Settings UI**
+**Option 2: Settings UI**
 1. Open Settings (Cmd+, / Ctrl+,)
 2. Search for "Codegen Preflight"
 3. Set `codegenPreflight.openaiApiKey`, `codegenPreflight.anthropicApiKey`, and `codegenPreflight.geminiApiKey`
+
+**Note**: Settings are stored in VS Code/Cursor settings and are shared between both IDEs if you use the same settings file.
 
 **Option 3: Environment Variables**
 Set these in your shell or `.env` file:
@@ -73,8 +142,10 @@ export GEMINI_API_KEY="AIza..."
 
 The extension automatically:
 - Refreshes the snapshot on startup if it's older than 24 hours
-- Generates/updates `.cursor/rules/01-version-snapshot.mdc`
-- Registers the MCP server with Cursor
+- Generates/updates `.cursor/rules/01-version-snapshot.mdc` (Cursor only)
+- Registers the MCP server in `.cursor/mcp.json` (Cursor only)
+- Runs daily background checks to ensure snapshot freshness
+- Detects workspace changes and triggers snapshot refresh when needed
 
 ### Manual
 
@@ -84,11 +155,11 @@ The extension automatically:
   - "Codegen Preflight: Open Preflight Panel" - Open side panel
   - "Codegen Preflight: Configure API Keys" - Set API keys
 - **Side Panel**: Open the Codegen Preflight view to see current state
-- **Command**: Use `/preflight` or `/snapshot` in Cursor chat to refresh or get snapshot info
+- **Cursor Slash Commands** (Cursor only): Use `/preflight` or `/snapshot` in Cursor chat to refresh or get snapshot info
 - **Copy Rule File**: Use "Copy Rule File to Clipboard" command to copy the generated rule file
-- **Global Config**: Use "Generate Global Cursor Config" to create a global config at `~/.cursor/rules/01-version-snapshot.mdc`
+- **Global Config** (Cursor only): Use "Generate Global Cursor Config" to create a global config at `~/.cursor/rules/01-version-snapshot.mdc`
 
-### MCP Tools
+### MCP Tools (Cursor Only)
 
 The MCP server provides these tools (use in Cursor chat):
 - `get_latest_versions` - Query npm/PyPI for package versions
@@ -104,7 +175,7 @@ The MCP server provides these tools (use in Cursor chat):
 - "List all available Anthropic models"
 - "Get the latest version of next.js"
 
-### MCP Resources
+### MCP Resources (Cursor Only)
 
 Access these resources in Cursor:
 - `preflight://snapshot/current` - Current day's cached snapshot
@@ -135,6 +206,76 @@ codegen-preflight/
     rules/              # Cursor rules (auto-generated + static)
     commands/           # Cursor commands
     mcp.json           # MCP server configuration
+```
+
+## Cursor-Specific Implementation Details
+
+### Extension Engine Support
+
+The extension declares support for both VS Code and Cursor in `package.json`:
+```json
+"engines": {
+  "vscode": "^1.85.0",
+  "cursor": "*"
+}
+```
+
+This allows the extension to:
+- Install and run in both VS Code and Cursor
+- Use Cursor-specific APIs when available
+- Gracefully degrade when Cursor APIs are not available
+
+### Cursor API Detection
+
+The extension detects Cursor by checking for the `cursor` property on the `vscode` namespace:
+```typescript
+const cursorApi = (vscode as any).cursor;
+if (cursorApi) {
+  // Cursor-specific features
+}
+```
+
+### MCP Server Registration
+
+The extension automatically creates/updates `.cursor/mcp.json` to register the MCP server:
+- Location: `.cursor/mcp.json` (workspace) or `~/.cursor/mcp.json` (global)
+- Merges with existing MCP configurations
+- Uses workspace-relative paths when possible
+- Requires Cursor restart/reload to take effect
+
+### Cursor Rules Generation
+
+The extension generates Cursor Rules files:
+- **Workspace**: `.cursor/rules/01-version-snapshot.mdc`
+- **Global**: `~/.cursor/rules/01-version-snapshot.mdc`
+- Format: Markdown with frontmatter (`.mdc`)
+- Policy: Always-apply (injected into every codegen session)
+
+### Cursor Commands
+
+Slash commands are defined in `.cursor/commands/preflight.md`:
+- `/preflight` - Trigger snapshot refresh
+- `/snapshot` - Get current snapshot info
+
+These are automatically available in Cursor chat when the extension is installed.
+
+### Installation Command Differences
+
+**VS Code:**
+- Uses `code --install-extension <file.vsix>`
+- Command: `code`
+
+**Cursor:**
+- Uses `cursor --install-extension <file.vsix>`
+- Command: `cursor`
+- On some systems, `code` may be aliased to Cursor
+
+**Checking which IDE a command points to:**
+```bash
+which code          # Shows binary location
+code --version      # Shows version and IDE info
+which cursor        # Shows Cursor binary location
+cursor --version    # Shows Cursor version
 ```
 
 ## Development
