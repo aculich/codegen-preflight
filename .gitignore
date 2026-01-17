@@ -7,3 +7,4 @@ dist/
 .cursor/rules/01-version-snapshot.mdc
 
 .specstory/
+upstream/
