@@ -153,7 +153,13 @@ cd packages/mcp-server && npm run build
 cd packages/extension && npm run build
 ```
 
+## Architecture Decision Records
+
+This project uses [Architecture Decision Records (ADRs)](docs/adr/) to document important architectural decisions and their rationale. ADRs help preserve context, avoid repeating mistakes, and onboard new contributors.
+
+See [design/DEVX.md](design/DEVX.md) for details on how to create and manage ADRs using [adr-chronicle](https://github.com/aculich/adr-chronicle).
+
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) for details. See [docs/adr/0001-license-selection.md](docs/adr/0001-license-selection.md) for the rationale behind this choice.
 
