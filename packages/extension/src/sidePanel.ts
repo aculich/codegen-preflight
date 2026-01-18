@@ -139,8 +139,11 @@ export class PreflightPanel {
     // Use the snapshot manager's method to get rule content
     const { promises: fs } = await import('fs');
     const { join } = await import('path');
-    const { getRulePath } = await import('@codegen-preflight/mcp-server/dist/utils/cache.js');
-    const { snapshotToRule } = await import('@codegen-preflight/mcp-server/dist/utils/snapshot-to-rule.js');
+    const { getMcpServerModulePath } = await import('./mcpServerPath');
+    const cachePath = getMcpServerModulePath('utils/cache.js');
+    const rulePath = getMcpServerModulePath('utils/snapshot-to-rule.js');
+    const { getRulePath } = await import(cachePath);
+    const { snapshotToRule } = await import(rulePath);
     
     const ruleContent = snapshotToRule(snapshot);
     
@@ -153,7 +156,9 @@ export class PreflightPanel {
     const { promises: fs } = await import('fs');
     const { join } = await import('path');
     const os = await import('os');
-    const { snapshotToRule } = await import('@codegen-preflight/mcp-server/dist/utils/snapshot-to-rule.js');
+    const { getMcpServerModulePath } = await import('./mcpServerPath');
+    const rulePath = getMcpServerModulePath('utils/snapshot-to-rule.js');
+    const { snapshotToRule } = await import(rulePath);
     
     // Get global Cursor config directory
     const globalCursorDir = join(os.homedir(), '.cursor', 'rules');

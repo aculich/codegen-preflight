@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "codegen-preflight": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/packages/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}",
+        "GEMINI_API_KEY": "${env:GEMINI_API_KEY}",
+        "GOOGLE_API_KEY": "${env:GOOGLE_API_KEY}",
+        "ENABLE_ENHANCED_FEATURES": "${env:ENABLE_ENHANCED_FEATURES}"
+      }
+    }
+  }
+}

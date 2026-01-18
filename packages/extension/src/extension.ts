@@ -7,6 +7,7 @@ import { SnapshotManager } from './snapshotManager';
 import { PreflightPanel } from './sidePanel';
 import { registerMCPServer } from './mcpRegistration';
 import { ApiKeyConfig } from './apiKeyConfig';
+import { getMcpServerModulePath } from './mcpServerPath';
 
 export async function activate(context: vscode.ExtensionContext) {
   // Create output channel for logging
@@ -67,7 +68,7 @@ export async function activate(context: vscode.ExtensionContext) {
         await snapshotManager.getSnapshot(force);
         outputChannel.appendLine('[Auto-preflight] Snapshot refreshed successfully');
         await updateStatusBar();
-      } catch (error) {
+      } catch (error: any) {
         outputChannel.appendLine(`[Auto-preflight] Failed to refresh: ${error}`);
         console.error('Failed to refresh snapshot:', error);
       }
@@ -154,7 +155,8 @@ export async function activate(context: vscode.ExtensionContext) {
     'codegenPreflight.copyRuleFile',
     async () => {
       const snapshot = await snapshotManager.getSnapshot();
-      const { snapshotToRule } = await import('@codegen-preflight/mcp-server/dist/utils/snapshot-to-rule.js');
+      const modulePath = getMcpServerModulePath('utils/snapshot-to-rule.js');
+      const { snapshotToRule } = await import(modulePath);
       const ruleContent = snapshotToRule(snapshot);
       await vscode.env.clipboard.writeText(ruleContent);
       vscode.window.showInformationMessage('Rule file copied to clipboard!');
@@ -168,7 +170,8 @@ export async function activate(context: vscode.ExtensionContext) {
       const { promises: fs } = await import('fs');
       const { join } = await import('path');
       const os = await import('os');
-      const { snapshotToRule } = await import('@codegen-preflight/mcp-server/dist/utils/snapshot-to-rule.js');
+      const modulePath = getMcpServerModulePath('utils/snapshot-to-rule.js');
+      const { snapshotToRule } = await import(modulePath);
       
       const globalCursorDir = join(os.homedir(), '.cursor', 'rules');
       await fs.mkdir(globalCursorDir, { recursive: true });

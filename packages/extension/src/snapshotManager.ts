@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { ApiKeyConfig } from './apiKeyConfig';
+import { getMcpServerModulePath } from './mcpServerPath';
 
 // Dynamic imports for ES module mcp-server
 let snapshotModule: any;
@@ -14,13 +15,28 @@ let ruleModule: any;
 
 async function loadModules() {
   if (!snapshotModule) {
-    snapshotModule = await import('@codegen-preflight/mcp-server/dist/resources/snapshot.js');
+    try {
+      const modulePath = getMcpServerModulePath('resources/snapshot.js');
+      snapshotModule = await import(modulePath);
+    } catch (error: any) {
+      throw error;
+    }
   }
   if (!cacheModule) {
-    cacheModule = await import('@codegen-preflight/mcp-server/dist/utils/cache.js');
+    try {
+      const modulePath = getMcpServerModulePath('utils/cache.js');
+      cacheModule = await import(modulePath);
+    } catch (error: any) {
+      throw error;
+    }
   }
   if (!ruleModule) {
-    ruleModule = await import('@codegen-preflight/mcp-server/dist/utils/snapshot-to-rule.js');
+    try {
+      const modulePath = getMcpServerModulePath('utils/snapshot-to-rule.js');
+      ruleModule = await import(modulePath);
+    } catch (error: any) {
+      throw error;
+    }
   }
   return { snapshotModule, cacheModule, ruleModule };
 }

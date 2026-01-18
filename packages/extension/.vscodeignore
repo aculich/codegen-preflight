@@ -22,6 +22,10 @@ tsconfig.json
 # Exclude source maps (optional - can include for debugging)
 *.map
 
+# Exclude cache and parent directory files
+.codegen-preflight/
+.specstory/
+
 # Exclude documentation that's not needed in extension
 docs/
 design/
@@ -41,7 +45,11 @@ upstream/
 # Exclude all files from parent directories
 ../*
 ../../*
-# Exclude mcp-server entirely (it's a workspace dependency, handled by npm)
+../../.codegen-preflight/
+../../.specstory/
+# Include mcp-server dist files (needed for dynamic imports)
+# We'll copy mcp-server/dist to extension/mcp-server/dist before packaging
+# So exclude the source locations but allow the copied location
 ../mcp-server/
 ../../packages/mcp-server/
 # But exclude parent directories themselves

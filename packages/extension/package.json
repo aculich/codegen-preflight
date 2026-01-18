@@ -116,6 +116,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "prepackage": "node ../../scripts/copy-mcp-server.js",
     "package": "vsce package"
   },
   "dependencies": {
